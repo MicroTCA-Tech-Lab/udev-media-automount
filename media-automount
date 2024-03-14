@@ -79,6 +79,10 @@ then
             rmdir "$dir"
         fi
     done
+
+    # remove empty directories
+    find "$mediadir"/* -maxdepth 0 -empty -exec rm -rf {} \;
+
     release_lock; exit $exitcode
 fi
 
