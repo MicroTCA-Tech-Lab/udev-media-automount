@@ -12,6 +12,8 @@ confdir=/etc/media-automount.d
 # Directory to use as parent media dir for mountpoints
 mediadir=/media
 
+declare -A devalias
+
 [ $(id -u) != 0 ] && {
     echo "This tool requires root permissions"
     exit 1
@@ -59,7 +61,7 @@ then
     fi
 
     # cleanup
-    for dir in "$mediadir"/*
+    for dir in "$mediadir"/*/*
     do
         # Only clean non active mountpoints that have no /etc/fstab entry
         if [ -d "$dir" ] && ! mountpoint -q "$dir" && ! grep -q "^\s*[^#\s]\+\s\+${dir}" /etc/fstab; then
@@ -91,8 +93,17 @@ then
     exit 0
 fi
 
+# Load board-specific device aliases
+if [ -e "$confdir/devalias" ]
+then
+    . "$confdir/devalias"
+fi
+
+DEVBASE=$(lsblk -no pkname $dev)
+DEVALIAS=${devalias["$DEVBASE"]}
+
 # directory name
-AUTOMOUNT_DIR="${mediadir}/${LABEL:-${dev##*/}}.$TYPE"
+AUTOMOUNT_DIR="${mediadir}/${DEVALIAS:-$DEVBASE}/${LABEL:-${dev##*/}}"
 
 # Avoid conflicts when multiple devices have the same label
 if [ -e "$AUTOMOUNT_DIR" ] && mountpoint -q "$AUTOMOUNT_DIR"

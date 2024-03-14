@@ -1,0 +1,3 @@
+devalias["mmcblk0"]="emmc"
+devalias["mmcblk1"]="sdcard"
+
