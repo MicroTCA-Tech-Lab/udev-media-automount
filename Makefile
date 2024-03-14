@@ -1,3 +1,5 @@
+clean:	;
+
 .PHONY: install
 install:
 	install -D media-automount $(DESTDIR)$(PREFIX)/bin/media-automount
