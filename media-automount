@@ -43,7 +43,8 @@ else
     dev=/dev/${1##*/}
 fi
 
-if [ "$dev" == "$(findmnt -n -o SOURCE /)" ]
+rootdev=$(findmnt -n -o SOURCE /)
+if [ "$dev" == "$rootdev" ]
 then
 	log "$dev is used as rootfs, automount won't manage it"
 	exit 0
@@ -115,10 +116,15 @@ then
 fi
 
 DEVBASE=$(lsblk -no pkname $dev)
-DEVALIAS=${devalias["$DEVBASE"]}
+ROOTBASE=$(lsblk -no pkname $rootdev)
 
-# directory name
-AUTOMOUNT_DIR="${mediadir}/${DEVALIAS:-$DEVBASE}/${LABEL:-${dev##*/}}"
+# If partition is on the same device as the root partition and has label "boot" then mount it at /boot
+if [ "$DEVBASE" == "$ROOTBASE" ] && [ "${LABEL,,}" == "boot" ] && ! mountpoint -q "/boot"; then
+    AUTOMOUNT_DIR="/boot"
+else
+    DEVALIAS=${devalias["$DEVBASE"]}
+    AUTOMOUNT_DIR="${mediadir}/${DEVALIAS:-$DEVBASE}/${LABEL:-${dev##*/}}"
+fi
 
 # Avoid conflicts when multiple devices have the same label
 if [ -e "$AUTOMOUNT_DIR" ] && mountpoint -q "$AUTOMOUNT_DIR"
