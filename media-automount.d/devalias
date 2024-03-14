@@ -1,3 +1,5 @@
-devalias["mmcblk0"]="emmc"
-devalias["mmcblk1"]="sdcard"
+# Example for devaliases
+#
+# devalias["mmcblk0"]="emmc"
+# devalias["mmcblk1"]="sdcard"
 
