@@ -20,11 +20,16 @@ declare -A devalias
 }
 
 log() {
-    echo "$*" | systemd-cat -p ${loglevel:-info} -t "media-automount"
+    echo "$*" | systemd-cat -p info -t "media-automount"
 }
 
-alias debuglog="loglevel=debug log"
-alias errorlog="loglevel=err log"
+debuglog() {
+    echo "$*" | systemd-cat -p debug -t "media-automount"
+}
+
+errorlog() {
+    echo "$*" | systemd-cat -p err -t "media-automount"
+}
 
 acquire_lock() {
 	exec 3>/var/run/media-automount.lock
